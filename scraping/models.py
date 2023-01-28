@@ -1,5 +1,5 @@
 from django.db import models
-from .utils import from_cyrillic_to_eng
+from django.utils.text import slugify
 
 
 class City(models.Model):
@@ -9,7 +9,7 @@ class City(models.Model):
         unique=True
     )
 
-    slug = models.SlugField(
+    slug = models.CharField(
         max_length=50,
         blank=True,
         unique=True
@@ -23,9 +23,10 @@ class City(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        """Автоматическое формирование слага из переданного названия"""
         if not self.slug:
-            self.slug = from_cyrillic_to_eng(self.name)
-        super().save(*args, **kwargs)
+            self.slug = slugify(self.name, allow_unicode=True)
+        super(City, self).save(*args, **kwargs)
 
 
 class Language(models.Model):
@@ -35,7 +36,7 @@ class Language(models.Model):
         unique=True
     )
 
-    slug = models.SlugField(
+    slug = models.CharField(
         max_length=50,
         blank=True,
         unique=True
@@ -49,6 +50,7 @@ class Language(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        """Автоматическое формирование слага из переданного названия"""
         if not self.slug:
-            self.slug = from_cyrillic_to_eng(self.name)
-        super().save(*args, **kwargs)
+            self.slug = slugify(self.name, allow_unicode=True)
+        super(Language, self).save(*args, **kwargs)
