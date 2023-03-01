@@ -1,6 +1,9 @@
 from django.db import models
 from django.utils.text import slugify
 
+def default_urls():
+    return {'work': '', 'hh': '', 'avito': ''}
+
 
 class City(models.Model):
     name = models.CharField(
@@ -88,6 +91,36 @@ class Vacancy(models.Model):
     class Meta:
         verbose_name = "Название вакансии"
         verbose_name_plural = "Названия вакансий"
+        ordering = ['-timestamp']
 
     def __str__(self):
         return self.title
+class Error(models.Model):
+    timestamp = models.DateField(
+        auto_now_add=True
+    )
+    data = models.JSONField()
+
+    class Meta:
+        verbose_name = "Ошибка"
+        verbose_name_plural = "Ошибки"
+
+    def __str__(self):
+        return f'{self.timestamp} - {self.data}'
+
+
+class Url(models.Model):
+    city = models.ForeignKey(
+        'City',
+        on_delete=models.CASCADE,
+        verbose_name="Название населенного пункта"
+    )
+    language = models.ForeignKey(
+        'Language',
+        on_delete=models.CASCADE,
+        verbose_name="Название языка программирования"
+    )
+    url_data = models.JSONField(default=default_urls)
+
+    class Meta:
+        unique_together = ('city', 'language')
